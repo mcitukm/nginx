@@ -14,6 +14,7 @@ podTemplate(containers: [
                         git version
                         pwd
                         ls -la
+                        echo "token is working"
                     '''
                 }
             }
