@@ -34,31 +34,35 @@ spec:
     }
     stages {
         stage('Sólo unos comandos linux') {
-            container('jnlp') {
-                stage('Verificando contenidos') {
-                    sh 'cd /opt/app/shared'
-                    sh 'touch file'
-                    git branch: 'main', url: 'https://github.com/mcitukm/nginx.git'
-                    sh '''
-                        git version
-                        pwd
-                        ls -la
-                        echo "INFO: git está funcionando ;?"
-                    '''
+            steps{
+                container('jnlp') {
+                    stage('Verificando contenidos') {
+                        sh 'cd /opt/app/shared'
+                        sh 'touch file'
+                        git branch: 'main', url: 'https://github.com/mcitukm/nginx.git'
+                        sh '''
+                            git version
+                            pwd
+                            ls -la
+                            echo "INFO: git está funcionando ;?"
+                        '''
+                    }
                 }
             }
         }
         stage('Construcción con docker') {
-            container('dind') {
-                stage('Verificando docker') {
-                    sh 'cd /opt/app/shared'
-                    //git branch: 'main', url: 'https://github.com/mcitukm/nginx.git'
-                    sh '''
-                        pwd
-                        ls -la
-                        docker ps
-                        echo "INFO: Docker está funcionando ;?"
-                    '''
+            steps{
+                container('dind') {
+                    stage('Verificando docker') {
+                        sh 'cd /opt/app/shared'
+                        //git branch: 'main', url: 'https://github.com/mcitukm/nginx.git'
+                        sh '''
+                            pwd
+                            ls -la
+                            docker ps
+                            echo "INFO: Docker está funcionando ;?"
+                        '''
+                    }
                 }
             }
         }
