@@ -1,43 +1,35 @@
-pipeline {
-    agent {
-    kubernetes {
-      label 'test-pod'
-      defaultContainer 'jnlp'
-      yaml """
-apiVersion: v1
-kind: Pod
-spec:
-  containers:
-  - name: frontend-test
-    image: centos:7
-    command:
-    - cat
-    tty: true
-    volumeMounts:
-    - mountPath: '/opt/app/shared'
-      name: sharedvolume
-  - name: backend-test
-    image: centos:7
-    command:
-    - cat
-    tty: true   
-    volumeMounts:
-    - mountPath: '/opt/app/shared'
-      name: sharedvolume
-  volumes:
-  - name: sharedvolume
-    emptyDir: {}
-"""
-        }
-    }
-    stages {
-        stage('Test Pipeline Configuration') {
-            steps {
-                container('frontend-test') {
-                    sh 'touch /opt/app/shared/test_file'
+podTemplate(containers: [
+    containerTemplate(
+        name: 'jnlp', 
+        image: 'jenkins/inbound-agent:latest'
+    ),
+    containerTemplate(
+        name: 'docker',
+        image: 'docker:dind'
+    )
+  ]) {
+    node(POD_LABEL) {
+        stage('Sólo unos comandos linux') {
+            container('jnlp') {
+                stage('Verificando contenidos') {
+                    git branch: 'main', url: 'https://github.com/mcitukm/nginx.git'
+                    sh '''
+                        git version
+                        pwd
+                        ls -la
+                        echo "INFO: git está funcionando ;?"
+                    '''
                 }
-                container('backend-test') {
-                    sh 'ls /opt/app/shared/test_file ; echo $?'
+            }
+        }
+        stage('Construcción con docker') {
+            container('jnlp') {
+                stage('Verificando docker') {
+                    //git branch: 'main', url: 'https://github.com/mcitukm/nginx.git'
+                    sh '''
+                        docker ps
+                        echo "INFO: Docker está funcionando ;?"
+                    '''
                 }
             }
         }
